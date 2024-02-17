@@ -2,12 +2,10 @@ import { Application, Router } from 'https://deno.land/x/oak@v13.2.5/mod.ts';
 import { oakCors } from 'https://deno.land/x/cors@v1.2.2/mod.ts';
 
 type Data = {
-  [no: string]: {
-    [key: string]: string | {
-      [key: string]: string | number
-    };
+  [key: string]: string | {
+    [key: string]: string | number;
   };
-};
+}[];
 
 type PostData = {
   member: string;
@@ -17,40 +15,42 @@ type PostData = {
   voted: number[];
 };
 
-const getData = async () => JSON.parse(await Deno.readTextFile('./api/data.json')) as Data;
-
 const router = new Router();
+
+const kv = await Deno.openKv();
+const KV_KEY = ['rankingParty', 20240223];
 
 router
   .get('/data', async (ctx) => {
-    const data = await getData();
-    console.log(data);
-    ctx.response.body = Object.values(data);
+    let data: string;
+    const value = (await kv.get(KV_KEY)).value;
+    if (value === null) {
+      data = await Deno.readTextFile('./api/template.json');
+      await kv.set(KV_KEY, data);
+    } else {
+      data = value as string;
+    }
+    ctx.response.body = JSON.parse(data);
   })
-  .post('/data', async (ctx, next) => {
+  .post('/data', async (ctx) => {
     const posted = await ctx.request.body.json() as PostData;
     console.log(posted);
-
-    const data = await getData();
-    Object.keys(data).forEach(no => {
-      const idx = parseInt(no, 10) - 1;
-
-      data[no][posted.member] = {
+    const value = (await kv.get(KV_KEY)).value;
+    if (value === null) {
+      ctx.response.body = { succeeded: false };
+      return;
+    }
+    const data = JSON.parse(value as string) as Data;
+    data.forEach((_, idx) => {
+      data[idx][posted.member] = {
         1: posted.items[idx][1],
         2: posted.items[idx][2],
         3: posted.items[idx][3],
         voted: posted.voted[idx],
       };
     });
-    console.log(data);
-
-    await Deno.writeTextFile('./api/data.json', JSON.stringify(data, null, 2)).catch((e) => {
-      console.error(e)
-      ctx.response.body = { succeeded: false };
-    });
-
-    ctx.response.body = { succeeded: true };
-    return next();
+    const result = await kv.set(KV_KEY, JSON.stringify(data));
+    ctx.response.body = { succeeded: result.ok };
   });
 
 const app = new Application();

@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "api": "deno run -A ./api/main.ts",
+    "api": "deno run -A --unstable-kv ./api/main.ts",
     "dev": "deno task api & deno run -A --node-modules-dir npm:vite",
     "build": "deno run -A --node-modules-dir npm:vite build",
     "preview": "deno task api & deno run -A --node-modules-dir npm:vite preview",
