@@ -17,7 +17,7 @@ const showResult = ref(false)
 const resultMsg = computed(() => succeeded ? '登録しました。' : '登録に失敗しました。')
 
 const fetchData = async () => {
-  const response = await fetch('http://localhost:8000/data')
+  const response = await fetch(`${import.meta.env.VITE_HOST}/data`)
   data.value = await response.json()
   scrollToTop()
 }
@@ -39,7 +39,7 @@ const update = async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:8000/data', {
+    const response = await fetch(`${import.meta.env.VITE_HOST}/data`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const scrollToTop = () => setTimeout(() => window.scroll({
   behavior: 'smooth'
 }), 500)
 
-onMounted(() => setTimeout(fetchData, 1000))
+onMounted(() => setTimeout(fetchData, 500))
 </script>
 
 <template>

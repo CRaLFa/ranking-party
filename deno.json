@@ -10,6 +10,7 @@
     "vue": "npm:vue",
     "vuetify": "npm:vuetify",
     "vuetify/styles": "npm:vuetify/styles",
+    "vite/client": "npm:vite/client",
     "@mdi/font/css/materialdesignicons.css": "npm:@mdi/font/css/materialdesignicons.css",
     "webfontloader": "npm:webfontloader"
   }

@@ -768,6 +768,7 @@
   "workspace": {
     "dependencies": [
       "npm:@mdi/font",
+      "npm:vite",
       "npm:vue",
       "npm:vuetify",
       "npm:webfontloader"
