@@ -1,6 +1,7 @@
 @use 'vuetify/settings' with (
   $switch-inset-thumb-off-height: 24px,
   $switch-inset-thumb-off-width: 24px,
-  $switch-inset-track-width: 104px,
-  $switch-track-width: 88px,
+  $switch-inset-track-width: 78px,
+  $switch-track-width: 62px,
+  $label-color: black,
 );

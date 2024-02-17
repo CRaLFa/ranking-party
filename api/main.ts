@@ -11,7 +11,7 @@ type Data = {
 
 type PostData = {
   member: string;
-  foods: {
+  items: {
     [rank: number]: string;
   }[];
   voted: number[];
@@ -24,30 +24,33 @@ const router = new Router();
 router
   .get('/data', async (ctx) => {
     const data = await getData();
-    ctx.response.body = data;
+    console.log(data);
+    ctx.response.body = Object.values(data);
   })
-  .post('/data', async (ctx) => {
+  .post('/data', async (ctx, next) => {
     const posted = await ctx.request.body.json() as PostData;
-    const data = await getData();
+    console.log(posted);
 
+    const data = await getData();
     Object.keys(data).forEach(no => {
-      const num = parseInt(no, 10);
+      const idx = parseInt(no, 10) - 1;
 
       data[no][posted.member] = {
-        1: posted.foods[num][1],
-        2: posted.foods[num][2],
-        3: posted.foods[num][3],
-        voted: posted.voted[num],
+        1: posted.items[idx][1],
+        2: posted.items[idx][2],
+        3: posted.items[idx][3],
+        voted: posted.voted[idx],
       };
     });
+    console.log(data);
 
-    Deno.writeTextFile('./api/data.json', JSON.stringify(data, null, 2))
-      .then(() => {
-        ctx.response.body = { succeeded: true };
-      })
-      .catch(() => {
-        ctx.response.body = { succeeded: false };
-      });
+    await Deno.writeTextFile('./api/data.json', JSON.stringify(data, null, 2)).catch((e) => {
+      console.error(e)
+      ctx.response.body = { succeeded: false };
+    });
+
+    ctx.response.body = { succeeded: true };
+    return next();
   });
 
 const app = new Application();
