@@ -8,6 +8,7 @@ type Data = {
 }[]
 
 const data = ref<Data>([])
+const tmpData = ref<Data>([])
 const editing = ref(false)
 const member = ref('A')
 const showConfirm = ref(false)
@@ -18,8 +19,15 @@ const resultMsg = computed(() => succeeded ? '登録しました。' : '登録�
 
 const fetchData = async () => {
   const response = await fetch(`${import.meta.env.VITE_HOST}/data`)
-  data.value = await response.json()
+  const responseJson = await response.json()
+  data.value = responseJson
+  tmpData.value = window.structuredClone(responseJson)
   scrollToTop()
+}
+
+const cancelEdit = () => {
+  data.value = tmpData.value
+  editing.value = false
 }
 
 const update = async () => {
@@ -68,9 +76,9 @@ const closeResult = () => {
 const scrollToTop = () => setTimeout(() => window.scroll({
   top: 0,
   behavior: 'smooth'
-}), 500)
+}), 250)
 
-onMounted(() => setTimeout(fetchData, 500))
+onMounted(() => setTimeout(fetchData, 250))
 </script>
 
 <template>
@@ -99,7 +107,7 @@ onMounted(() => setTimeout(fetchData, 500))
           block
           class="text-h6 rounded-xl"
           v-else
-          @click="editing = false"
+          @click="cancelEdit"
         >
           キャンセル
         </v-btn>
@@ -154,7 +162,7 @@ onMounted(() => setTimeout(fetchData, 500))
           <div v-else>
             <div v-for="i in 3">
               <p class="text-h6">
-                {{ data[idx]['B']['voted'] === i ? '☑' : '☐️' }} {{ i }}位：{{ data[idx]['A'][i] }}
+                {{ data[idx]['B']['voted'] === i ? '✅' : '☐️' }} {{ i }}位：{{ data[idx]['A'][i] }}
               </p>
             </div>
           </div>

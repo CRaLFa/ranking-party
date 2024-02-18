@@ -15,47 +15,51 @@ type PostData = {
   voted: number[];
 };
 
-const router = new Router();
-
-const kv = await Deno.openKv();
 const KV_KEY = ['rankingParty', 20240223];
 
-router
-  .get('/data', async (ctx) => {
-    let data: string;
-    const value = (await kv.get(KV_KEY)).value;
-    if (value === null) {
-      data = await Deno.readTextFile('./api/template.json');
-      await kv.set(KV_KEY, JSON.stringify(data));
-    } else {
-      data = value as string;
-    }
-    ctx.response.body = JSON.parse(data);
-  })
-  .post('/data', async (ctx) => {
-    const posted = await ctx.request.body.json() as PostData;
-    console.log(posted);
-    const value = (await kv.get(KV_KEY)).value;
-    if (value === null) {
-      ctx.response.body = { succeeded: false };
-      return;
-    }
-    const data = JSON.parse(value as string) as Data;
-    data.forEach((_, idx) => {
-      data[idx][posted.member] = {
-        1: posted.items[idx][1],
-        2: posted.items[idx][2],
-        3: posted.items[idx][3],
-        voted: posted.voted[idx],
-      };
+(async () => {
+
+  const router = new Router();
+  const kv = await Deno.openKv();
+
+  router
+    .get('/data', async (ctx) => {
+      let data: string;
+      const value = (await kv.get(KV_KEY)).value;
+      if (value === null) {
+        data = await Deno.readTextFile('./api/template.json');
+        await kv.set(KV_KEY, JSON.stringify(data));
+      } else {
+        data = value as string;
+      }
+      ctx.response.body = JSON.parse(data);
+    })
+    .post('/data', async (ctx) => {
+      const posted = await ctx.request.body.json() as PostData;
+      console.log(posted);
+      const value = (await kv.get(KV_KEY)).value;
+      if (value === null) {
+        ctx.response.body = { succeeded: false };
+        return;
+      }
+      const data = JSON.parse(value as string) as Data;
+      data.forEach((_, idx) => {
+        data[idx][posted.member] = {
+          1: posted.items[idx][1],
+          2: posted.items[idx][2],
+          3: posted.items[idx][3],
+          voted: posted.voted[idx],
+        };
+      });
+      const result = await kv.set(KV_KEY, JSON.stringify(data));
+      ctx.response.body = { succeeded: result.ok };
     });
-    const result = await kv.set(KV_KEY, JSON.stringify(data));
-    ctx.response.body = { succeeded: result.ok };
-  });
 
-const app = new Application();
-app.use(oakCors()); // Enable CORS for All Routes
-app.use(router.routes());
-app.use(router.allowedMethods());
+  const app = new Application();
+  app.use(oakCors()); // Enable CORS for All Routes
+  app.use(router.routes());
+  app.use(router.allowedMethods());
 
-await app.listen({ port: 8000 });
+  await app.listen({ port: 8000 });
+
+})();
