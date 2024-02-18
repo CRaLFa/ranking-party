@@ -25,10 +25,11 @@ const KV_KEY = ['rankingParty', 20240223];
   router
     .get('/data', async (ctx) => {
       let data: string;
+      // await kv.delete(KV_KEY);
       const value = (await kv.get(KV_KEY)).value;
       if (value === null) {
         data = await Deno.readTextFile('./api/template.json');
-        await kv.set(KV_KEY, JSON.stringify(data));
+        await kv.set(KV_KEY, data);
       } else {
         data = value as string;
       }

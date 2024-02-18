@@ -8,7 +8,6 @@ type Data = {
 }[]
 
 const data = ref<Data>([])
-const tmpData = ref<Data>([])
 const editing = ref(false)
 const member = ref('A')
 const showConfirm = ref(false)
@@ -19,15 +18,18 @@ const resultMsg = computed(() => succeeded ? '登録しました。' : '登録�
 
 const fetchData = async () => {
   const response = await fetch(`${import.meta.env.VITE_HOST}/data`)
-  const responseJson = await response.json()
-  data.value = responseJson
-  tmpData.value = window.structuredClone(responseJson)
+  data.value = await response.json()
   scrollToTop()
 }
 
+const startEdit = () => {
+  editing.value = true
+  fetchData()
+}
+
 const cancelEdit = () => {
-  data.value = tmpData.value
   editing.value = false
+  fetchData()
 }
 
 const update = async () => {
@@ -97,7 +99,7 @@ onMounted(() => setTimeout(fetchData, 250))
           block
           class="text-h6 rounded-xl"
           v-if="!editing"
-          @click="editing = true"
+          @click="startEdit"
         >
           編集
         </v-btn>
