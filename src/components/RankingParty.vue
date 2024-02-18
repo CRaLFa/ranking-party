@@ -165,7 +165,7 @@ onMounted(() => setTimeout(fetchData, 250))
           <div v-else>
             <div v-for="i in 3">
               <p class="text-h6">
-                {{ data[idx]['B']['voted'] === i ? '✅' : '☐️' }} {{ i }}位：{{ data[idx]['A'][i] }}
+                {{ data[idx]['B']['voted'] === i ? '☑' : '☐️' }} {{ i }}位：{{ data[idx]['A'][i] }}
               </p>
             </div>
           </div>
