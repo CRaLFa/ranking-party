@@ -156,6 +156,7 @@ onMounted(() => setTimeout(fetchData, 250))
                   <v-radio
                     :value="i"
                     :label="`${i}位：${data[idx]['A'][i]}`"
+                    :disabled="data[idx]['A'][i].trim().length < 1"
                   />
                 </div>
               </div>
@@ -190,6 +191,7 @@ onMounted(() => setTimeout(fetchData, 250))
                   <v-radio
                     :value="i"
                     :label="`${i}位：${data[idx]['B'][i]}`"
+                    :disabled="data[idx]['B'][i].trim().length < 1"
                   />
                 </div>
               </div>
