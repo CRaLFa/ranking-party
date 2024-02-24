@@ -14,7 +14,7 @@ const showConfirm = ref(false)
 const succeeded = ref(false)
 const showResult = ref(false)
 
-const resultMsg = computed(() => succeeded ? '登録しました。' : '登録に失敗しました。')
+const resultMsg = computed(() => succeeded.value ? '登録しました。' : '登録に失敗しました。')
 
 const fetchData = async () => {
   const response = await fetch(`${import.meta.env.VITE_HOST}/data`)
